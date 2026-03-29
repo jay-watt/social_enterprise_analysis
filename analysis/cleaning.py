@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from utils import (
+from analysis.utils import (
     print_process_heading,
     print_processing_results,
     save_and_print_table
@@ -37,13 +37,25 @@ def drop_high_missing_columns(df, threshold):
 def drop_redundant_columns(df, corr_threshold):
     missing_corr = df.isnull().corr()
     corr_unstacked = missing_corr.unstack()
-    high_corr_pairs = corr_unstacked[(corr_unstacked > corr_threshold)].sort_values(ascending=False)
+    high_corr_pairs = corr_unstacked[(1 > corr_unstacked) & (corr_unstacked > corr_threshold)].sort_values(ascending=False)
     
-    save_and_print_table('highly correlated missing values', high_corr_pairs.to_frame())
+    corr_df = high_corr_pairs.to_frame(name='Correlation')
 
+    save_and_print_table('highly correlated missing values', corr_df)
+
+    important_cols = {'charity size', 'registration status', 'total gross income', 'total revenue'}
+    
     cols_to_drop = set()
-    for (col_a, col_b), corr_val in high_corr_pairs.items():
+    for (col_a, col_b), _ in high_corr_pairs.items():
         if (col_a == col_b):
+            continue
+
+        # If either is important, drop the OTHER one
+        if col_a.lower() in important_cols:
+            cols_to_drop.add(col_b)
+            continue
+        if col_b.lower() in important_cols:
+            cols_to_drop.add(col_a)
             continue
 
         missing_a = (df[col_a].isnull().sum() / len(df)) * 100
@@ -60,6 +72,9 @@ def drop_redundant_columns(df, corr_threshold):
                 cols_to_drop.add(col_a)
             else:
                 cols_to_drop.add(col_b)
+    
+    df = df.drop(columns=list(cols_to_drop))
+    print(f'Dropped {len(cols_to_drop)} redundant columns: {", ".join(cols_to_drop)}')
     
     return df
 

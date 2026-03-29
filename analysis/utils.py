@@ -1,7 +1,5 @@
 import os
 
-import pandas as pd
-import seaborn as sns
 from tabulate import tabulate
 
 def print_process_heading(process):
