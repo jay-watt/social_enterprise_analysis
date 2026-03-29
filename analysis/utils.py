@@ -4,12 +4,6 @@ import pandas as pd
 import seaborn as sns
 from tabulate import tabulate
 
-TABLES_DIR = 'Tables'
-MAX_COL_WIDTH = 50
-
-def load_data(filename):
-    return pd.read_csv(filename)
-
 def print_process_heading(process):
     print()
     print('=' * 50)
@@ -32,8 +26,8 @@ def save_and_print_table(title, df):
 
         title_words = title_words[:-1]
 
-    os.makedirs(TABLES_DIR, exist_ok=True)
-    df.to_excel(f'{TABLES_DIR}/{sheet_name}.xlsx')
+    os.makedirs('../output', exist_ok=True)
+    df.to_excel(f'../output/{sheet_name}.xlsx')
 
     formatted_title = ' '.join(word.capitalize() for word in title.split())
     formatted_table = tabulate(
@@ -41,7 +35,7 @@ def save_and_print_table(title, df):
         headers=[df.index.name] + list(df.columns),
         tablefmt='fancy_grid',
         showindex='always',
-        maxcolwidths=[MAX_COL_WIDTH] * (len(df.columns) + 1),
+        maxcolwidths=[50] * (len(df.columns) + 1),
     )
     print(f'\n{formatted_title}')
     print(formatted_table, '\n')

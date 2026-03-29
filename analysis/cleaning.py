@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 
-from initial_analysis import display_stats
 from utils import (
     print_process_heading,
     print_processing_results,
